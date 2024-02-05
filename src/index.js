@@ -1,12 +1,17 @@
-import { parseArgs } from './cli/args.js';
-import { homedir } from 'os';
-import * as readline from 'node:readline';
-import { ls } from './fs/ls.js';
-import { currentDirectory } from './currentDirectory/currentDirectory.js';
-import { cat } from './fs/cat.js';
-import { add } from './fs/add.js';
-import { rn } from './fs/rn.js';
-import { rm } from './fs/rm.js';
+import { parseArgs } from "./cli/args.js";
+import { homedir } from "os";
+import * as readline from "node:readline";
+import { ls } from "./fs/ls.js";
+import { currentDirectory } from "./currentDirectory/currentDirectory.js";
+import { cat } from "./fs/cat.js";
+import { cp } from "./fs/cp.js";
+import { mv } from "./fs/mv.js";
+import { add } from "./fs/add.js";
+import { rn } from "./fs/rn.js";
+import { rm } from "./fs/rm.js";
+import { compress } from "./zip/compress.js";
+import { decompress } from "./zip/decompress.js";
+import { cd } from "./nav/cd.js";
 
 const fileManager = async () => {
   const username = parseArgs();
@@ -18,15 +23,15 @@ const fileManager = async () => {
     input: process.stdin,
     output: process.stdout,
   });
-  rl.on('line', async (line) => {
-    const lineArr = line.split(' ').filter((el) => el.trim());
+  rl.on("line", async (line) => {
+    const lineArr = line.split(" ").filter((el) => el.trim());
     const command = lineArr[0];
     const parameters = lineArr.slice(1);
     switch (command) {
-      case '.close':
+      case ".close":
         rl.close();
         break;
-      case 'ls':
+      case "ls":
         if (parameters.length === 0) {
           await ls();
           currentDirectory();
@@ -34,7 +39,47 @@ const fileManager = async () => {
           process.stdout.write(`Invalid input\n`);
         }
         break;
-      case 'cat':
+      case "cd":
+        if (parameters.length === 1) {
+          await cd(parameters);
+          currentDirectory();
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+      case "compress":
+        if (parameters.length === 2) {
+          await compress(parameters);
+          currentDirectory();
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+      case "cp":
+        if (parameters.length === 2) {
+          await cp(parameters);
+          currentDirectory();
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+      case "mv":
+        if (parameters.length === 2) {
+          await mv(parameters);
+          currentDirectory();
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+      case "decompress":
+        if (parameters.length === 2) {
+          await decompress(parameters);
+          currentDirectory();
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+      case "cat":
         if (parameters.length === 1) {
           await cat(parameters).then((result) => {
             process.stdout.write(result);
@@ -44,7 +89,7 @@ const fileManager = async () => {
           process.stdout.write(`Invalid input\n`);
         }
         break;
-      case 'add':
+      case "add":
         if (parameters.length === 1) {
           await add(parameters).then((result) => {
             process.stdout.write(result);
@@ -54,7 +99,7 @@ const fileManager = async () => {
           process.stdout.write(`Invalid input\n`);
         }
         break;
-      case 'rn':
+      case "rn":
         if (parameters.length === 2) {
           await rn(parameters);
           currentDirectory();
@@ -62,7 +107,7 @@ const fileManager = async () => {
           process.stdout.write(`Invalid input\n`);
         }
         break;
-      case 'rm':
+      case "rm":
         if (parameters.length === 1) {
           await rm(parameters);
           currentDirectory();
@@ -75,10 +120,9 @@ const fileManager = async () => {
         break;
     }
   });
-  rl.on('close', () => {
+  rl.on("close", () => {
     process.stdout.write(`Thank you for using File Manager, ${username}!`);
   });
 };
 
 await fileManager();
-
