@@ -1,6 +1,6 @@
 import { createReadStream } from 'node:fs';
 import { resolve } from 'node:path';
-import { exists } from '../additions/additions.js';
+import { exists } from '../utils/others.js';
 
 export const calculateHash = async (parameters) => {
   try {

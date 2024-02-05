@@ -2,7 +2,7 @@ import { parseArgs } from "./cli/args.js";
 import { homedir } from "os";
 import * as readline from "node:readline";
 import { ls } from "./fs/ls.js";
-import { calculateHash } from './hash/calcHash.js';
+import { calculateHash } from './hash/hash.js';
 import { currentDirectory } from "./currentDirectory/currentDirectory.js";
 import { cat } from "./fs/cat.js";
 import { cp } from "./fs/cp.js";
@@ -14,6 +14,7 @@ import { compress } from "./zip/compress.js";
 import { decompress } from "./zip/decompress.js";
 import { cd } from "./nav/cd.js";
 import { up } from './up/up.js';
+import { os } from './os/os.js';
 
 const fileManager = async () => {
   const username = parseArgs();
@@ -30,8 +31,20 @@ const fileManager = async () => {
     const command = lineArr[0];
     const parameters = lineArr.slice(1);
     switch (command) {
-      case ".close":
+      case ".exit":
         rl.close();
+        break;
+        case 'os':
+        if (parameters.length === 1 && typeof parameters !== 'undefined') {
+          if (parameters[0].startsWith('--')) {
+            await os(parameters);
+            currentDirectory();
+          } else {
+            process.stdout.write(`Invalid input\n`);
+          }
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
         break;
       case "ls":
         if (parameters.length === 0) {
@@ -141,7 +154,7 @@ const fileManager = async () => {
     }
   });
   rl.on("close", () => {
-    process.stdout.write(`Thank you for using File Manager, ${username}!`);
+    process.stdout.write(`Thank you for using File Manager, ${username}, goodbye!`);
   });
 };
 
