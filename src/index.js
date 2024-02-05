@@ -2,6 +2,7 @@ import { parseArgs } from "./cli/args.js";
 import { homedir } from "os";
 import * as readline from "node:readline";
 import { ls } from "./fs/ls.js";
+import { calculateHash } from './hash/calcHash.js';
 import { currentDirectory } from "./currentDirectory/currentDirectory.js";
 import { cat } from "./fs/cat.js";
 import { cp } from "./fs/cp.js";
@@ -12,6 +13,7 @@ import { rm } from "./fs/rm.js";
 import { compress } from "./zip/compress.js";
 import { decompress } from "./zip/decompress.js";
 import { cd } from "./nav/cd.js";
+import { up } from './up/up.js';
 
 const fileManager = async () => {
   const username = parseArgs();
@@ -39,9 +41,27 @@ const fileManager = async () => {
           process.stdout.write(`Invalid input\n`);
         }
         break;
+        case 'hash':
+        if (parameters.length === 1) {
+          await calculateHash(parameters).then((result) => {
+            process.stdout.write(`${result}\n`);
+          });
+          currentDirectory();
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
       case "cd":
         if (parameters.length === 1) {
           await cd(parameters);
+          currentDirectory();
+        } else {
+          process.stdout.write(`Invalid input\n`);
+        }
+        break;
+        case 'up':
+        if (parameters.length === 0) {
+          await up();
           currentDirectory();
         } else {
           process.stdout.write(`Invalid input\n`);
